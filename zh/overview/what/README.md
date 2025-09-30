@@ -34,9 +34,9 @@
 
 ![Three Pillars](three-pillars.png)
 
-<span style="color:gray; font-size: 12px">图1：可观测性三大支柱。来源：[What Is Observability? Comprehensive Beginners Guide](https://devopscube.com/what-is-observability/)</span>
+图1：可观测性三大支柱。来源：[What Is Observability? Comprehensive Beginners Guide](https://devopscube.com/what-is-observability/)
 
-这个说法非常有利于可观测性的推广和普及，显然，三大支柱不仅仅是一种可观测性数据的分类，也给了我们数据建设的方向指引，但三大支柱并不能等同于可观测性。
+这个说法非常有利于可观测性的推广和普及，显然，三大支柱不仅仅是一种可观测性数据的分类，也给了我们数据建设的方向指引，但三大支柱并不等同于可观测性。
 
 ## 宽事件
 
