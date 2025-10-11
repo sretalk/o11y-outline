@@ -2,7 +2,7 @@
   - [什么是可观测性](./overview/what/)
   - [可观测性与监控的区别和联系](./overview/diff/)
   - [可观测性建设路径](./overview/path/)
-  - 小结
+  - [小结](./overview/summary/)
 
 * 可观测性支柱 - 指标
   - 指标概述
