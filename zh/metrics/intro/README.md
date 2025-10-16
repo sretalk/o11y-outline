@@ -110,8 +110,90 @@ Google SRE 那本书中提到，Google 所有的应用程序暴露的指标都�
 
 - `var`：指标名字
 - `job`：服务名称
-- `service`：一个松散定义的集合，由一些为内部或外部用户提供服务的job组成，例如 web
+- `service`：一个松散定义的集合，由一些为内部或外部用户提供服务的 job 组成，例如 web
 - `zone`：数据中心
+
+每个公司都应该有类似的要求。
 
 ## 指标的类型
 
+不同的监控、观测产品对指标类型的划分略有区别，我们以业内最流行的 Prometheus 体系为例，介绍常见的指标类型。 Prometheus 支持四种指标类型，分别是 Counter、Gauge、Histogram 和 Summary。
+
+### Counter
+
+Counter 是一种单调递增的指标类型，只能增加，不能减少，只有在重启时才会重置。典型的 Counter 指标有：
+
+- HTTP 请求总数，从服务启动之后就会一直增加
+- 机器网卡收到的数据包总量，从机器启动之后就会一直增加
+
+Counter 类型的指标，其名称通常以 `_total` 结尾，比如 `http_requests_total`。
+
+Counter 类型的指标，我们通常不关注其当前值是多少，而是关注其变化率，Prometheus 提供了 rate() 函数用于计算 Counter 指标的变化率。
+
+### Gauge
+
+Gauge 是一种可以增减的指标类型，可以增加，也可以减少。典型的 Gauge 指标有：
+
+- 当前内存使用率
+- 当前在线用户数
+
+### Histogram
+
+Histogram 是一种统计分布的指标类型，用于统计不同区间的分布情况。典型的 Histogram 指标有：
+
+- HTTP 请求响应时间分布
+- HTTP 请求响应大小分布
+
+Histogram 类型的指标，通常会包含多个子指标，分别表示不同区间的统计情况。比如 HTTP 请求响应时间的 Histogram 指标（http_request_duration_seconds），通常会包含以下子指标：
+
+```
+http_request_duration_seconds_bucket{le="0.1"} 240
+http_request_duration_seconds_bucket{le="0.2"} 300
+http_request_duration_seconds_bucket{le="0.5"} 400
+http_request_duration_seconds_bucket{le="1"} 500
+http_request_duration_seconds_bucket{le="+Inf"} 600
+http_request_duration_seconds_sum 123.45
+http_request_duration_seconds_count 600
+```
+
+- `_bucket` 子指标表示不同区间的请求数量，`le` 标签表示区间的上限
+- `_sum` 子指标表示所有请求的响应时间总和
+- `_count` 子指标表示请求总数
+
+> bucket 划分的颗粒度越细，Histogram 指标的存储开销就越大，但是能更精确地反映分布情况。需要根据实际需求，权衡颗粒度和存储开销。
+
+Histogram 类型的指标，可以使用 Prometheus 提供的 histogram_quantile() 函数，计算某个百分位数的值，比如计算 95 分位的 HTTP 请求响应时间：
+
+```
+histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket[5m])) by (le))
+```
+
+### Summary
+
+Summary 和 Histogram 类似，也是用于统计分布的指标类型。不同的是，Summary 直接计算出某些百分位数的值，而不是像 Histogram 那样，存储多个区间的统计情况。
+
+Summary 类型的指标，通常会包含以下子指标：
+
+```
+http_request_duration_seconds{quantile="0.5"} 0.05
+http_request_duration_seconds{quantile="0.9"} 0.1
+http_request_duration_seconds{quantile="0.99"} 0.2
+http_request_duration_seconds_sum 123.45
+http_request_duration_seconds_count 600
+```
+
+- `{quantile="0.5"}` 表示 50 分位的值
+- `{quantile="0.9"}` 表示 90 分位的值
+- `{quantile="0.99"}` 表示 99 分位的值
+- `_sum` 子指标表示所有请求的响应时间总和
+- `_count` 子指标表示请求总数
+
+Histogram 和 Summary 各有优缺点：
+
+- Histogram 的优点是可以灵活地计算任意百分位数的值，缺点是存储开销较大
+- Summary 的优点是存储开销较小，缺点是只能计算预先定义好的百分位数的值
+- Histogram 是在服务端统一计算的，可以跨实例聚合，Summary 是在客户端计算的，不能跨实例聚合
+
+## 小结
+
+本节介绍了指标的基本概念、标签的作用和规范，以及常见的指标类型。这些信息尤其关键，是理解和使用指标的基础，是排查一些复杂问题的前提。
