@@ -190,7 +190,7 @@ http_request_duration_seconds_count 600
 
 Histogram 和 Summary 各有优缺点：
 
-- Histogram 的优点是可以灵活地计算任意百分位数的值，缺点是存储开销较大
+- Histogram 的优点是可以灵活地计算任意百分位数的值，缺点是存储开销较大，计算性能差一些
 - Summary 的优点是存储开销较小，缺点是只能计算预先定义好的百分位数的值
 - Histogram 是在服务端统一计算的，可以跨实例聚合，Summary 是在客户端计算的，不能跨实例聚合
 
