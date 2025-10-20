@@ -22,7 +22,7 @@ Active(anon):       4852 kB
 Inactive(anon):  5011608 kB
 Active(file):    1186152 kB
 Inactive(file):   681004 kB
-... (省略若干行) ...
+... (more) ...
 ```
 
 有时只靠 `/proc` 的内容是不够的，还需要做系统调用来获取数据，比如磁盘利用率相关的指标，是通过 `statfs` 系统调用来获取的。
@@ -73,7 +73,7 @@ used_memory_human:5.04M
 used_memory_rss:27045888
 used_memory_rss_human:25.79M
 used_memory_peak:17602640
-... (省略若干行) ...
+... (more) ...
 ```
 
 这些存储系统都是非常成熟的软件，具有良好的可观测性，为了方便用户了解软件运行的情况，自然要暴露各类指标。亲爱的读者朋友，你们自己写的软件，也要注意这一点呀！
